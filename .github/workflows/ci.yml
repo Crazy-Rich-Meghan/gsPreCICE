@@ -48,7 +48,7 @@ jobs:
           sudo make install
           
           # Set the path to precice installation for future steps
-          echo "/usr/local/lib/cmake/precice" >> $GITHUB_ENV
+          echo "/usr/local/lib/cmake/precice-3.1.2/build" >> $GITHUB_ENV
 
       - name: "Run for ${{ matrix.os }}"
         shell: bash
