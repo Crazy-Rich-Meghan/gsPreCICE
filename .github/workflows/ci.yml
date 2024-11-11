@@ -11,8 +11,8 @@ on:
 concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
+
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: RelWithDebInfo
 
 jobs:
@@ -23,20 +23,20 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
         with:
           repository: gismo/gismo
           ref: stable
           path: ./gismo
 
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
         with:
           path: ./gismo/optional/${{ github.event.repository.name }}
-          #token: ${{ secrets.GH_PAT }}
+          # Uncomment token if using a private repo
+          # token: ${{ secrets.GH_PAT }}
           
-      # Step to install preCICE
-      - name: Install preCICE
-        if: runner.os == 'Linux' # or change based on OS
+      - name: Install preCICE (Linux only)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake libboost-all-dev \
@@ -50,7 +50,21 @@ jobs:
           make -j$(nproc)
           sudo make install
 
-      - name: "Run for ${{ matrix.os }}"
+      - name: Display Directory Structure
+        run: |
+          echo "Listing root directory..."
+          ls -la
+          echo "Listing gismo directory..."
+          ls -la ./gismo
+
+      - name: Run Tests for ${{ matrix.os }}
         shell: bash
-        working-directory: ${{runner.workspace}}
-        run: ctest -S ${{ github.event.repository.name }}/gismo/cmake/ctest_script.cmake -D CTEST_BUILD_NAME="${{ github.event.repository.name }}_actions_$GITHUB_RUN_NUMBER" -D CTEST_SITE="${{ matrix.os }}_[actions]" -D CMAKE_ARGS="-DCMAKE_BUILD_TYPE=$BUILD_TYPE;-DCMAKE_CXX_STANDARD=11;-DGISMO_WITH_XDEBUG=ON;-DGISMO_BUILD_UNITTESTS=ON" -D GISMO_OPTIONAL="${{ github.event.repository.name }}" -Q
+        working-directory: ${{ runner.workspace }}
+        run: |
+          set -x  # Enable debug mode
+          ctest -S ${{ github.event.repository.name }}/gismo/cmake/ctest_script.cmake \
+          -D CTEST_BUILD_NAME="${{ github.event.repository.name }}_actions_$GITHUB_RUN_NUMBER" \
+          -D CTEST_SITE="${{ matrix.os }}_[actions]" \
+          -D CMAKE_ARGS="-DCMAKE_BUILD_TYPE=$BUILD_TYPE;-DCMAKE_CXX_STANDARD=11;-DGISMO_WITH_XDEBUG=ON;-DGISMO_BUILD_UNITTESTS=ON" \
+          -D GISMO_OPTIONAL="${{ github.event.repository.name }}" \
+          --output-on-failure  # Show detailed output on failure
