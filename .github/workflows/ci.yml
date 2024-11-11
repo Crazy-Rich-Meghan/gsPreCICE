@@ -47,8 +47,8 @@ jobs:
           make -j 10
           sudo make install
           
-          # Set the path to precice installation for future steps
-          echo "/usr/local/lib/cmake/precice-3.1.2/build" >> $GITHUB_ENV
+    
+
 
       - name: "Run for ${{ matrix.os }}"
         shell: bash
@@ -58,5 +58,5 @@ jobs:
           ctest -S ${{ github.event.repository.name }}/gismo/cmake/ctest_script.cmake \
           -D CTEST_BUILD_NAME="${{ github.event.repository.name }}_actions_$GITHUB_RUN_NUMBER" \
           -D CTEST_SITE="${{ matrix.os }}_[actions]" \
-          -D CMAKE_ARGS="-DCMAKE_BUILD_TYPE=$BUILD_TYPE;-DCMAKE_CXX_STANDARD=11;-DGISMO_WITH_XDEBUG=ON;-DGISMO_BUILD_UNITTESTS=ON;-Dprecice_DIR=$precice_DIR" \
+          -D CMAKE_ARGS="-DCMAKE_BUILD_TYPE=$BUILD_TYPE;-DCMAKE_CXX_STANDARD=11;-DGISMO_WITH_XDEBUG=ON;-DGISMO_BUILD_UNITTESTS=ON;-Dprecice_DIR=/usr/local/lib/cmake/precice-3.1.2/build" \
           -D GISMO_OPTIONAL="${{ github.event.repository.name }}" -Q
