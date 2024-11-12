@@ -36,7 +36,7 @@ jobs:
           
       # Step to install preCICE
       - name: Install preCICE
-        if: runs-on.os == 'ubuntu-latest'
+        if: runner.os == 'ubuntu-latest'
         run: |
           sudo apt update
           sudo apt install -y build-essential cmake libeigen3-dev libxml2-dev libboost-all-dev petsc-dev python3-dev python3-numpy
@@ -44,6 +44,7 @@ jobs:
           tar -xzvf v3.1.2.tar.gz
           cd precice-3.1.2
           cmake --preset=production  # Configure using the production preset
+          cd build
           make -j 10
           sudo make install
           precice_DIR=$(pwd)
