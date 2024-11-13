@@ -48,6 +48,20 @@ jobs:
           make -j 10
           sudo make install
           precice_DIR=$(pwd)
+
+      # Step to install preCICE
+      - name: Install preCICE for mac
+        if: runner.os == 'macOS'
+        run: |
+          brew install cmake eigen libxml2 boost petsc openmpi python3 numpy
+          wget https://github.com/precice/precice/archive/v3.1.2.tar.gz
+          tar -xzvf v3.1.2.tar.gz
+          cd precice-3.1.2
+          cmake --preset=production  # Configure using the production preset
+          cd build
+          make -j 10
+          sudo make install
+          precice_DIR=$(pwd)
           
       - name: "Run for ${{ matrix.os }}"
         shell: bash
