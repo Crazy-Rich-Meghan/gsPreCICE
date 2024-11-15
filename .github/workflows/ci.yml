@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [ macos-latest, ubuntu-latest]
     steps:
       - uses: actions/checkout@master
         with:
@@ -35,7 +35,7 @@ jobs:
           #token: ${{ secrets.GH_PAT }}
           
       # Step to install preCICE
-      - name: Install preCICE
+      - name: Install preCICE for Linux
         if: runner.os == 'Linux'
         run: |
           sudo apt update
@@ -47,7 +47,10 @@ jobs:
           cd build
           make -j 10
           sudo make install
-          precice_DIR=$(pwd)
+          export precice_DIR=$(pwd)
+          echo "precice_DIR is set to $precice_DIR"
+          ls -l $precice_DIR
+
 
       # Step to install preCICE
       - name: Install preCICE for mac
@@ -61,7 +64,10 @@ jobs:
           cd build
           make -j 10
           sudo make install
-          precice_DIR=$(pwd)
+          export precice_DIR=$(pwd)
+          echo "precice_DIR is set to $precice_DIR"
+          ls -l $precice_DIR
+
           
       - name: "Run for ${{ matrix.os }}"
         shell: bash
